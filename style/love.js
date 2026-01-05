@@ -230,6 +230,8 @@
         this.initFooter();
         this.initBranch();
         this.initBloom();
+
+        this.persistentBlooms = [];
     }
     Tree.prototype = {
         initSeed: function() {
@@ -266,7 +268,9 @@
                 figure = this.seed.heart.figure;
             var r = 240, x, y;
             for (var i = 0; i < num; i++) {
-                cache.push(this.createBloom(width, height, r, figure));
+                var b = this.createBloom(width, height, r, figure);
+                b.isTreeHeart = true;
+                cache.push(b);
             }
             this.blooms = [];
             this.bloomsCache = cache;
@@ -355,7 +359,16 @@
         },
 
         canFlower: function() {
-            return !!this.blooms.length;
+            // return true if there are still blooms growing or in cache
+            if (this.bloomsCache.length > 0) {
+                return true;
+            }
+            for(var i = 0; i < this.blooms.length; i++) {
+                if (this.blooms[i].scale < 1) {
+                    return true;
+                }
+            }
+            return false;
         },
         flower: function(num) {
             var s = this, blooms = s.bloomsCache.splice(0, num);
@@ -363,7 +376,7 @@
                 s.addBloom(blooms[i]);
             }
             blooms = s.blooms;
-            for (var j = 0; j < blooms.length; j++) {
+            for (var j = blooms.length - 1; j >= 0; j--) {
                 blooms[j].flower();
             }
         },
@@ -408,12 +421,21 @@
         },
 
         jump: function() {
-            var s = this, blooms = s.blooms;
+            var s = this, blooms = s.blooms, persistentBlooms = s.persistentBlooms;
+            
+            // Animate persistent and falling hearts
+            if (persistentBlooms.length) {
+                for (var i = 0; i < persistentBlooms.length; i++) {
+                    persistentBlooms[i].jump();
+                }
+            }
             if (blooms.length) {
-                for (var i = 0; i < blooms.length; i++) {
+                for (var i = blooms.length - 1; i >= 0; i--) {
                     blooms[i].jump();
                 }
             }
+
+            // Create new falling hearts
             if ((blooms.length && blooms.length < 3) || !blooms.length) {
                 var bloom = this.opt.bloom || {},
                     width = bloom.width || this.width,
@@ -489,7 +511,13 @@
             s.draw();
             s.scale += 0.1;
             if (s.scale > 1) {
-                s.tree.removeBloom(s);
+                s.scale = 1;
+                if (s.isTreeHeart) {
+                    s.tree.persistentBlooms.push(s);
+                    s.tree.removeBloom(s);
+                } else {
+                    s.tree.removeBloom(s);
+                }
             }
         },
         draw: function() {
@@ -513,14 +541,37 @@
         },
         jump: function() {
             var s = this, height = s.tree.height;
+            if (s.isTreeHeart) {
+                // it's a heart on the tree, shake it
+                s.angle += (Math.random() - 0.5) * 0.1;
 
-            if (s.point.x < -20 || s.point.y > height + 20) {
-                s.tree.removeBloom(s);
+                // Draw with offset
+                var ctx = s.tree.ctx, figure = s.figure;
+                ctx.save();
+                ctx.fillStyle = s.color;
+                ctx.globalAlpha = s.alpha;
+                ctx.translate(s.point.x + 260, s.point.y);
+                ctx.scale(s.scale, s.scale);
+                ctx.rotate(s.angle);
+                ctx.beginPath();
+                ctx.moveTo(0, 0);
+                for (var i = 0; i < figure.length; i++) {
+                    var p = figure.get(i);
+                    ctx.lineTo(p.x, -p.y);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.restore();
             } else {
-                s.draw();
-                s.point = s.place.sub(s.point).div(s.speed).add(s.point);
-                s.angle += 0.05;
-                s.speed -= 1;
+                // it's a falling heart
+                if (s.point.x < -20 || s.point.y > height + 20) {
+                    s.tree.removeBloom(s);
+                } else {
+                    s.draw();
+                    s.point = s.place.sub(s.point).div(s.speed).add(s.point);
+                    s.angle += 0.05;
+                    s.speed -= 1;
+                }
             }
         }
     }
