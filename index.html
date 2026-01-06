@@ -4,6 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
     <link type="text/css" rel="stylesheet" href="./style/default.css">
+    <link type="text/css" rel="stylesheet" href="./style/falling_images.css">
     <script  type="text/javascript" src="./style/jquery.min.js"></script>
     <script  type="text/javascript" src="./style/jscex.min.js"></script>
     <script  type="text/javascript" src="./style/jscex-parser.js"></script>
@@ -11,6 +12,8 @@
     <script  type="text/javascript" src="./style/jscex-builderbase.min.js"></script>
     <script  type="text/javascript" src="./style/jscex-async.min.js"></script>
     <script  type="text/javascript" src="./style/jscex-async-powerpack.min.js"></script>
+    <script type="text/javascript" src="./style/fireworks.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/fireworks-js@2.10.2/dist/fireworks.js"></script> -->
     <script  type="text/javascript" src="./style/functions.js" charset="utf-8"></script>
     <script  type="text/javascript" src="./style/love.js" charset="utf-8"></script>
     <title>Love Tree 🌳❤️</title>
@@ -19,7 +22,9 @@
         <audio id="loveMusic" loop >
             <source src="style/nhac.mp3" type="audio/mp3" />
         </audio>
+        <canvas id="fireworks-canvas" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9998; pointer-events: none;"></canvas>
         <div id="main">
+            <div class="falling-images-container"></div>
              <div id="wrap">
                 <div id="text">
 			        <div id="code">
@@ -39,20 +44,24 @@
             </div>
         </div>
     <script>
+
     (function(){
         var canvas = $('#canvas');
 
         if (!canvas[0].getContext) {
             $("#error").show();
-            return false;        }
+            return false;
+        }
 
         var width = canvas.width();
         var height = canvas.height();
+        console.log("Canvas ready", width, height);
         canvas.attr("width", width);
         canvas.attr("height", height);
         var opts = {
             seed: {
                 x: width / 2 - 20,
+                y: height / 2,
                 color: "rgb(190, 26, 37)",
                 scale: 2
             },
@@ -90,6 +99,9 @@
         var seed = tree.seed;
         var foot = tree.footer;
         var hold = 1;
+        console.log("Tree created", tree, seed);
+        seed.draw();
+        console.log("Seed drawn");
 
         canvas.click(function(e) {
             var offset = canvas.offset(), x, y;
@@ -113,36 +125,58 @@
         });
 
         var seedAnimate = eval(Jscex.compile("async", function () {
+            console.log('seedAnimate start');
             seed.draw();
+            
+            // Giai đoạn 1: Chờ click
             while (hold) {
                 $await(Jscex.Async.sleep(10));
             }
+
+            // Giai đoạn 2: Thu nhỏ trái tim
+            console.log("Starting scale animation...");
+            var scaleCount = 0;
             while (seed.canScale()) {
                 seed.scale(0.95);
                 $await(Jscex.Async.sleep(10));
+                scaleCount++;
+                if(scaleCount > 200) break; // Safety break: Tránh treo nếu kẹt
             }
+
+            // Giai đoạn 3: Di chuyển hạt giống
+            console.log("Starting move animation...");
+            var moveCount = 0;
             while (seed.canMove()) {
                 seed.move(0, 2);
                 foot.draw();
                 $await(Jscex.Async.sleep(10));
+                moveCount++;
+                if(moveCount > 1000) { // Safety break: Tránh treo nếu hạt giống đi lạc
+                    console.log("Force break move loop");
+                    break; 
+                }
             }
+            console.log("seedAnimate finished"); // Nếu thấy dòng này là thành công
         }));
 
         var growAnimate = eval(Jscex.compile("async", function () {
+            console.log('growAnimate start');
             do {
-    	        tree.grow();
+	        tree.grow();
                 $await(Jscex.Async.sleep(10));
             } while (tree.canGrow());
         }));
 
         var flowAnimate = eval(Jscex.compile("async", function () {
+            console.log('flowAnimate start');
             do {
-    	        tree.flower(2);
+	        tree.flower(2);
                 $await(Jscex.Async.sleep(10));
             } while (tree.canFlower());
         }));
 
         var moveAnimate = eval(Jscex.compile("async", function () {
+            console.log('moveAnimate start');
             tree.snapshot("p1", 240, 0, 610, 680);
             while (tree.move("p1", 500, 0)) {
                 foot.draw();
@@ -158,6 +192,7 @@
         }));
 
         var jumpAnimate = eval(Jscex.compile("async", function () {
+            console.log('jumpAnimate start');
             var ctx = tree.ctx;
             while (true) {
                 tree.ctx.clearRect(0, 0, width, height);
@@ -168,16 +203,24 @@
         }));
 
         var textAnimate = eval(Jscex.compile("async", function () {
-		    var together = new Date();
-		    together.setFullYear(2018,2 , 8);
-		    together.setHours(0);
-		    together.setMinutes(0);
-		    together.setSeconds(0);
+            console.log('textAnimate start');
+            var together = new Date();
+            together.setFullYear(2018,2 , 8);
+            together.setHours(0);
+            together.setMinutes(0);
+            together.setSeconds(0);
             together.setMilliseconds(0);
 
-
-
-		    $("#code").show().typewriter();
+            $("#code").show().typewriter({
+                callback: function() {
+                    var fireworks = new Fireworks(document.getElementById('fireworks-canvas'));
+                    fireworks.start();
+                    setTimeout(function() {
+                        fireworks.stop();
+                        startFallingImages();
+                    }, 8000); // Increased fireworks duration
+                }
+            });
             $("#clock-box").fadeIn(500);
             while (true) {
                 timeElapse(together);
@@ -185,18 +228,87 @@
             }
         }));
 
+        function startFallingImages() {
+        // Xóa container cũ nếu có
+        var oldContainer = document.getElementById('falling-images-container');
+        if (oldContainer) oldContainer.remove();
+
+        var container = document.createElement('div');
+        container.id = 'falling-images-container';
+        document.body.appendChild(container);
+
+        // Tạo số lượng ảnh nhiều hơn để nó rơi lác đác liên tục
+        // Bạn có 10 ảnh gốc, ta sẽ tạo khoảng 30 thẻ img để lặp lại các ảnh đó
+        var totalFallingItems = 30; 
+
+        for (var i = 0; i < totalFallingItems; i++) {
+            var img = document.createElement('img');
+            
+            // Random chọn 1 trong 10 ảnh (tên file 1.jpg -> 10.jpg)
+            var imgIndex = Math.floor(Math.random() * 10) + 1; 
+            img.src = './style/images/' + imgIndex + '.jpg';
+            
+            img.className = 'falling-image';
+
+            // --- CẤU HÌNH RANDOM CHO TỪNG ẢNH ---
+            
+            // 1. Vị trí ngang (Left): Từ 0% đến 90% màn hình
+            var leftPos = Math.floor(Math.random() * 90); 
+            img.style.left = leftPos + '%';
+
+            // 2. Kích thước (Scale): Ảnh to ảnh nhỏ cho tự nhiên (từ 0.6 đến 1.0)
+            var scale = (Math.random() * 0.4) + 0.6;
+            img.style.transform = 'scale(' + scale + ')';
+
+            // 3. Tốc độ rơi (Duration): Từ 15 giây đến 25 giây (Rơi thật chậm)
+            var duration = (Math.random() * 10) + 15; 
+            img.style.animationDuration = duration + 's';
+
+            // 4. Độ trễ (Delay): Để chúng không rơi cùng lúc. Từ 0s đến 20s
+            var delay = Math.random() * 20; 
+            img.style.animationDelay = delay + 's';
+
+            // 5. Góc xoay (Rotation): Xoay từ góc A sang góc B
+            var rotStart = (Math.random() * 60) - 30; // -30 đến 30 độ
+            var rotEnd = (Math.random() * 360) - 180; // Quay tự do
+            img.style.setProperty('--rotation-start', rotStart + 'deg');
+            img.style.setProperty('--rotation-end', rotEnd + 'deg');
+
+            container.appendChild(img);
+        }
+    }
+
+        // --- BẮT ĐẦU ĐOẠN CODE MỚI ---
+        
+        // Hàm tổng điều khiển toàn bộ kịch bản
         var runAsync = eval(Jscex.compile("async", function () {
-            $await(seedAnimate());
+            // 1. Chờ hiệu ứng hạt giống chạy xong
+            $await(seedAnimate()); 
+            console.log("Hạt giống xong, bắt đầu mọc cây...");
+
+            // 2. Chờ cây mọc xong
             $await(growAnimate());
+            console.log("Cây mọc xong, bắt đầu nở hoa...");
+
+            // 3. Chờ hoa nở xong
             $await(flowAnimate());
+            console.log("Hoa nở xong, di chuyển cây...");
+
+            // 4. Chờ di chuyển cây sang vị trí mới
             $await(moveAnimate());
+            console.log("Di chuyển xong, hiện chữ và pháo hoa...");
 
+            // 5. Cuối cùng: Hiện chữ và Nhảy múa (chạy song song không cần await)
             textAnimate().start();
-
-            $await(jumpAnimate());
+            jumpAnimate().start();
         }));
 
+        // Kích hoạt kịch bản
         runAsync().start();
+
+        // --- KẾT THÚC ĐOẠN CODE MỚI ---
+
+        runAsync();
     })();
     </script>
 </div>

@@ -12,7 +12,10 @@ $(window).resize(function() {
 });
 
 (function($) {
-	$.fn.typewriter = function() {
+	$.fn.typewriter = function(options) {
+		var settings = $.extend({
+			callback: function() {}
+		}, options);
 		this.each(function() {
 			var $ele = $(this), str = $ele.html(), progress = 0;
 			$ele.html('');
@@ -26,6 +29,7 @@ $(window).resize(function() {
 				$ele.html(str.substring(0, progress) + (progress & 1 ? '_' : ''));
 				if (progress >= str.length) {
 					clearInterval(timer);
+					settings.callback();
 				}
 			}, 75);
 		});

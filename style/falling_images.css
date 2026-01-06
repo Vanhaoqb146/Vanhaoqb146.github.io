@@ -1,0 +1,47 @@
+/* Container chứa ảnh */
+#falling-images-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1; /* Đặt thấp để nằm dưới chữ (thường chữ là z-index > 10) */
+  overflow: hidden;
+}
+
+/* Style chung cho ảnh */
+.falling-image {
+  position: absolute;
+  top: -300px; /* Bắt đầu từ phía trên màn hình */
+  width: 150px; /* Kích thước ảnh vừa phải */
+  height: auto;
+  border: 5px solid #fff; /* Viền trắng polaroid */
+  border-radius: 15px; /* Bo góc */
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Bóng đổ nhẹ */
+  opacity: 0.9;
+
+  /* Kích hoạt animation */
+  /* Thời gian và độ trễ sẽ được set random bằng JS */
+  animation: fall linear infinite;
+  will-change: transform; /* Tối ưu hiệu năng cho trình duyệt */
+}
+
+/* Định nghĩa hoạt hình rơi */
+@keyframes fall {
+  0% {
+    transform: translateY(0) rotate(var(--rotation-start));
+    opacity: 0;
+  }
+  10% {
+    opacity: 1; /* Hiện rõ dần khi vào màn hình */
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    /* Rơi xuống quá màn hình (100vh) + thêm 500px dư ra */
+    transform: translateY(calc(100vh + 500px)) rotate(var(--rotation-end));
+    opacity: 0;
+  }
+}

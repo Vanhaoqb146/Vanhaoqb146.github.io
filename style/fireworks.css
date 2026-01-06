@@ -1,0 +1,47 @@
+.pyro > .before, .pyro > .after {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  box-shadow: -120px -218.25px #00f, 248px -16.25px #00f, 190px 16.25px #00f, 200px -183.75px #00f, -113px -308.75px #00f, -109px -287.75px #00f, 113px -162.75px #00f, 131px -223.75px #00f, 115px -254.75px #00f, 43px -161.75px #00f, -243px -259.75px #00f, -159px -222.75px #00f, -113px -107.75px #00f, -221px -202.75px #00f, 244px -231.75px #00f, -118px -34.75px #00f, -243px -174.75px #00f, 14px -330.75px #00f, -161px -100.75px #00f, -127px -311.75px #00f, 218px -340.75px #00f, 5px -259.75px #00f, -100px -322.75px #00f, -242px -115.75px #00f, -14px -194.75px #00f, -249px -327.75px #00f, -196px -328.75px #00f, 221px -202.75px #00f, -13px -134.75px #00f, -102px -12.75px #00f, 141px -251.75px #00f, -243px -11.75px #00f, -159px -114.75px #00f, -237px -243.75px #00f, -118px -219.75px #00f, -121px -32.75px #00f, -149px -124.75px #00f, 54px -127.75px #00f, -183px -29.75px #00f, -234px -321.75px #00f, -202px -179.75px #00f, 171px -240.75px #00f, 221px -72.75px #00f, -174px -222.75px #00f, -241px -311.75px #00f, -191px -289.75px #00f, 128px -338.75px #00f, -137px -332.75px #00f, -157px -191.75px #00f;
+  animation: 1s bang ease-out infinite backwards, 1s gravity ease-in infinite backwards, 5s position ease-in-out infinite backwards;
+}
+
+.pyro > .after {
+  animation-delay: 1.25s, 1.25s, 1.25s;
+  animation-duration: 1.25s, 1.25s, 6.25s;
+}
+
+@keyframes bang {
+  from {
+    box-shadow: 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white, 0 0 white;
+  }
+}
+@keyframes gravity {
+  to {
+    transform: translateY(200px);
+    opacity: 0;
+  }
+}
+@keyframes position {
+  0%, 19.9% {
+    margin-top: 10%;
+    margin-left: 40%;
+  }
+  20%, 39.9% {
+    margin-top: 40%;
+    margin-left: 30%;
+  }
+  40%, 59.9% {
+    margin-top: 20%;
+    margin-left: 70%;
+  }
+  60%, 79.9% {
+    margin-top: 30%;
+    margin-left: 20%;
+  }
+  80%, 99.9% {
+    margin-top: 30%;
+    margin-left: 80%;
+  }
+}

@@ -2,7 +2,7 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Pacifico', cursive;
+  font-family: "Pacifico", cursive;
 }
 
 body {
@@ -18,6 +18,8 @@ a {
 }
 #main {
   width: 100%;
+  position: relative; /* Bắt buộc có dòng này */
+  z-index: 10; /* Cao hơn z-index của ảnh rơi */
 }
 #wrap {
   position: relative;
@@ -51,4 +53,3 @@ a {
 .space {
   margin-left: 100px;
 }
-
