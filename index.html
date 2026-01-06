@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
     <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
     <link type="text/css" rel="stylesheet" href="./style/default.css">
     <link type="text/css" rel="stylesheet" href="./style/falling_images.css">
@@ -18,45 +18,6 @@
     <script  type="text/javascript" src="./style/functions.js" charset="utf-8"></script>
     <script  type="text/javascript" src="./style/love.js" charset="utf-8"></script>
     <title>Happy Birthday Vợ - Mẹ Leo ❤️ </title>
-    <style>
-    /* CSS Mặc định giữ nguyên... */
-    
-    /* --- BỔ SUNG CSS CHO ĐIỆN THOẠI (Màn hình nhỏ hơn 768px) --- */
-    @media screen and (max-width: 768px) {
-        /* 1. Chỉnh lại khung bao quanh */
-        #wrap {
-            width: 100% !important; /* Co giãn full màn hình */
-            height: auto !important;
-            position: relative;
-            padding-top: 20px;
-        }
-
-        /* 2. Đưa đoạn văn chúc mừng lên đầu và căn giữa */
-        #text {
-            position: relative !important; /* Không dùng absolute nữa */
-            width: 90% !important; /* Chừa lề 2 bên */
-            left: 5% !important;
-            top: auto !important;
-            margin-top: 0;
-            text-align: center; /* Căn giữa chữ */
-            z-index: 100; /* Nổi lên trên */
-        }
-        
-        /* Chỉnh font chữ nhỏ lại chút cho dễ đọc */
-        #code {
-            font-size: 14px; 
-            line-height: 1.5;
-        }
-
-        /* 3. Co giãn cây trái tim cho vừa màn hình */
-        #canvas {
-            width: 100% !important; /* Ép canvas co lại theo chiều ngang */
-            height: auto !important;
-            display: block;
-            margin: 0 auto; /* Căn giữa cây */
-        }
-    }
-</style>
 </head>
     <body>
         <audio id="loveMusic" loop >
@@ -143,34 +104,27 @@
         seed.draw();
         console.log("Seed drawn");
 
-        // Thay thế toàn bộ đoạn canvas.click cũ bằng đoạn này:
         canvas.click(function(e) {
-            var offset = canvas.offset();
-            var x, y;
-            
-            // Tính toán tỷ lệ co giãn (Scale)
-            // Nếu màn hình điện thoại, canvas bị thu nhỏ lại, ta cần nhân tỷ lệ lên
-            var scaleX = canvas[0].width / canvas.width(); 
-            var scaleY = canvas[0].height / canvas.height();
-
-            x = (e.pageX - offset.left) * scaleX;
-            y = (e.pageY - offset.top) * scaleY;
-
-            // Mẹo cho Mobile: Cho phép click vào vùng rộng hơn hoặc click bất kỳ đâu để bắt đầu
-            // Vì trên điện thoại bấm trúng cái hạt nhỏ xíu rất khó
-            if (window.innerWidth < 768 || seed.hover(x, y)) {
-                hold = 0; 
+            var offset = canvas.offset(), x, y;
+            x = e.pageX - offset.left;
+            y = e.pageY - offset.top;
+            if (seed.hover(x, y)) {
+                hold = 0;
                 canvas.unbind("click");
                 canvas.unbind("mousemove");
                 canvas.removeClass('hand');
-                
-                // Phát nhạc
                 var music = document.getElementById("loveMusic");
                 if (music.paused) {
                     music.play().catch(err => console.log("Autoplay blocked:", err));
                 }
             }
+        }).mousemove(function(e){
+            var offset = canvas.offset(), x, y;
+            x = e.pageX - offset.left;
+            y = e.pageY - offset.top;
+            canvas.toggleClass('hand', seed.hover(x, y));
         });
+
         var seedAnimate = eval(Jscex.compile("async", function () {
             console.log('seedAnimate start');
             seed.draw();
