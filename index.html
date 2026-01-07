@@ -20,6 +20,13 @@
     <title>Happy Birthday Vợ - Mẹ Leo ❤️ </title>
 </head>
     <body>
+        <div id="ending-screen">
+            <div class="ending-content">
+        <h1>Cảm ơn em đã làm vợ của anh ❤️</h1>
+        <p>Chúc Mẹ Leo tuổi mới luôn rạng rỡ!</p>
+        <button onclick="location.reload()">Yêu Vợ (Xem lại)</button>
+            </div>
+        </div>
         <audio id="loveMusic" loop >
             <source src="style/nhac.mp3" type="audio/mp3" />
         </audio>
@@ -277,6 +284,20 @@
 
             container.appendChild(img);
         }
+        setTimeout(function() {
+            var ending = document.getElementById('ending-screen');
+            ending.style.display = 'flex'; // Bắt đầu hiển thị
+            
+            // Một chút delay nhỏ để hiệu ứng fade-in hoạt động
+            setTimeout(function() {
+                ending.style.opacity = '1'; // Hiện rõ dần lên
+            }, 100);
+
+            // Tùy chọn: Làm nhỏ nhạc dần rồi tắt (nếu muốn)
+            var music = document.getElementById("loveMusic");
+            music.volume = 0.5; // Giảm volume dần... (cần code phức tạp hơn nếu muốn fade out nhạc)
+
+        }, 35000); // 30000 ms = 30 giây
     }
 
         // --- BẮT ĐẦU ĐOẠN CODE MỚI ---
